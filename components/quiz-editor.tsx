@@ -18,6 +18,7 @@ type Question = {
   text: string;
   order_index: number;
   question_display_seconds: number;
+  answer_collection_seconds: number;
   answer_display_seconds: number;
   answers: Answer[];
 };
@@ -28,7 +29,7 @@ export async function QuizEditor({ quizId }: { quizId: string }) {
   const { data: questions, error } = await supabase
     .from("questions")
     .select(
-      "id, text, order_index, question_display_seconds, answer_display_seconds, answers(id, text, is_correct, order_index)",
+      "id, text, order_index, question_display_seconds, answer_collection_seconds, answer_display_seconds, answers(id, text, is_correct, order_index)",
     )
     .eq("quiz_id", quizId)
     .order("order_index");

@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StartSessionButton } from "@/components/start-session-button";
 import { createClient } from "@/lib/supabase/server";
 import { Plus } from "lucide-react";
 import Link from "next/link";
@@ -82,33 +83,33 @@ export async function AdminDashboard() {
 
             return (
               <li key={quiz.id}>
-                <Link href={`/admin/quizzes/${quiz.id}`}>
-                  <Card className="transition-colors hover:bg-muted/50">
-                    <CardContent className="flex items-center justify-between py-4">
-                      <div>
-                        <p className="font-medium">{quiz.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(quiz.created_at).toLocaleDateString(
-                            "pl-PL",
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {quiz.status === "approved" && (
-                          <Badge>Gotowy</Badge>
-                        )}
-                        <Badge variant="secondary">
-                          {questionCount}{" "}
-                          {questionCount === 1
-                            ? "pytanie"
-                            : questionCount < 5
-                              ? "pytania"
-                              : "pytań"}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <Card>
+                  <CardContent className="flex items-center justify-between gap-4 py-4">
+                    <Link
+                      href={`/admin/quizzes/${quiz.id}`}
+                      className="flex-1 min-w-0 hover:opacity-80 transition-opacity"
+                    >
+                      <p className="font-medium">{quiz.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(quiz.created_at).toLocaleDateString("pl-PL")}
+                      </p>
+                    </Link>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {quiz.status === "approved" && <Badge>Gotowy</Badge>}
+                      <Badge variant="secondary">
+                        {questionCount}{" "}
+                        {questionCount === 1
+                          ? "pytanie"
+                          : questionCount < 5
+                            ? "pytania"
+                            : "pytań"}
+                      </Badge>
+                      {quiz.status === "approved" && (
+                        <StartSessionButton quizId={quiz.id} size="sm" />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </li>
             );
           })}

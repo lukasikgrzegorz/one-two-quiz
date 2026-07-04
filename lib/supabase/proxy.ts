@@ -55,7 +55,8 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/lobby") ||
     pathname.startsWith("/play");
 
-  const isAdminPath = pathname.startsWith("/admin");
+  const isAdminPath =
+    pathname.startsWith("/admin") || pathname.startsWith("/host");
 
   if (!user && isAdminPath) {
     const url = request.nextUrl.clone();

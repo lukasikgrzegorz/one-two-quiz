@@ -6,12 +6,14 @@ import { requireQuizOwnership } from "./auth";
 type ActionResult = { error?: string };
 
 const DEFAULT_QUESTION_SECONDS = 10;
-const DEFAULT_ANSWER_SECONDS = 5;
+const DEFAULT_ANSWER_COLLECTION_SECONDS = 15;
+const DEFAULT_ANSWER_REVEAL_SECONDS = 5;
 
 type ParsedTiming =
   | { error: string }
   | {
       questionDisplaySeconds: number;
+      answerCollectionSeconds: number;
       answerDisplaySeconds: number;
     };
 
@@ -19,8 +21,12 @@ function parseTiming(formData: FormData): ParsedTiming {
   const questionDisplay = Number(
     formData.get("question_display_seconds") ?? DEFAULT_QUESTION_SECONDS,
   );
+  const answerCollection = Number(
+    formData.get("answer_collection_seconds") ??
+      DEFAULT_ANSWER_COLLECTION_SECONDS,
+  );
   const answerDisplay = Number(
-    formData.get("answer_display_seconds") ?? DEFAULT_ANSWER_SECONDS,
+    formData.get("answer_display_seconds") ?? DEFAULT_ANSWER_REVEAL_SECONDS,
   );
 
   if (
@@ -32,14 +38,26 @@ function parseTiming(formData: FormData): ParsedTiming {
   }
 
   if (
+    !Number.isInteger(answerCollection) ||
+    answerCollection < 1 ||
+    answerCollection > 120
+  ) {
+    return { error: "Czas na wybór odpowiedzi musi być od 1 do 120 sekund" };
+  }
+
+  if (
     !Number.isInteger(answerDisplay) ||
     answerDisplay < 1 ||
     answerDisplay > 120
   ) {
-    return { error: "Czas na odpowiedź musi być od 1 do 120 sekund" };
+    return { error: "Czas na wynik musi być od 1 do 120 sekund" };
   }
 
-  return { questionDisplaySeconds: questionDisplay, answerDisplaySeconds: answerDisplay };
+  return {
+    questionDisplaySeconds: questionDisplay,
+    answerCollectionSeconds: answerCollection,
+    answerDisplaySeconds: answerDisplay,
+  };
 }
 
 function parseAnswers(formData: FormData) {
@@ -110,6 +128,7 @@ export async function addQuestion(
       text,
       order_index: orderIndex,
       question_display_seconds: timing.questionDisplaySeconds,
+      answer_collection_seconds: timing.answerCollectionSeconds,
       answer_display_seconds: timing.answerDisplaySeconds,
     })
     .select("id")
@@ -232,6 +251,7 @@ export async function updateQuestion(
     .update({
       text,
       question_display_seconds: timing.questionDisplaySeconds,
+      answer_collection_seconds: timing.answerCollectionSeconds,
       answer_display_seconds: timing.answerDisplaySeconds,
     })
     .eq("id", questionId);

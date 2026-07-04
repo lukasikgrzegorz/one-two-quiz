@@ -11,11 +11,13 @@ import { useActionState, useState } from "react";
 const MIN_ANSWERS = 2;
 const MAX_ANSWERS = 4;
 const DEFAULT_QUESTION_SECONDS = 10;
-const DEFAULT_ANSWER_SECONDS = 5;
+const DEFAULT_ANSWER_COLLECTION_SECONDS = 15;
+const DEFAULT_ANSWER_REVEAL_SECONDS = 5;
 
 export type QuestionFormInitial = {
   text: string;
   question_display_seconds: number;
+  answer_collection_seconds: number;
   answer_display_seconds: number;
   answers: { text: string; is_correct: boolean }[];
 };
@@ -107,7 +109,7 @@ export function QuestionForm({
         />
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-3 gap-4">
         <div className="grid gap-2">
           <Label htmlFor={isEdit ? `question_seconds_${questionId}` : "question_display_seconds"}>
             Czas na pytanie (s)
@@ -123,22 +125,42 @@ export function QuestionForm({
               initial?.question_display_seconds ?? DEFAULT_QUESTION_SECONDS
             }
           />
+          <p className="text-xs text-muted-foreground">Tylko treść pytania</p>
         </div>
         <div className="grid gap-2">
-          <Label htmlFor={isEdit ? `answer_seconds_${questionId}` : "answer_display_seconds"}>
-            Czas na odpowiedź (s)
+          <Label htmlFor={isEdit ? `answer_collection_${questionId}` : "answer_collection_seconds"}>
+            Czas na wybór (s)
           </Label>
           <Input
-            id={isEdit ? `answer_seconds_${questionId}` : "answer_display_seconds"}
+            id={isEdit ? `answer_collection_${questionId}` : "answer_collection_seconds"}
+            name="answer_collection_seconds"
+            type="number"
+            min={1}
+            max={120}
+            required
+            defaultValue={
+              initial?.answer_collection_seconds ??
+              DEFAULT_ANSWER_COLLECTION_SECONDS
+            }
+          />
+          <p className="text-xs text-muted-foreground">Gdy widać odpowiedzi</p>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor={isEdit ? `answer_reveal_${questionId}` : "answer_display_seconds"}>
+            Czas na wynik (s)
+          </Label>
+          <Input
+            id={isEdit ? `answer_reveal_${questionId}` : "answer_display_seconds"}
             name="answer_display_seconds"
             type="number"
             min={1}
             max={120}
             required
             defaultValue={
-              initial?.answer_display_seconds ?? DEFAULT_ANSWER_SECONDS
+              initial?.answer_display_seconds ?? DEFAULT_ANSWER_REVEAL_SECONDS
             }
           />
+          <p className="text-xs text-muted-foreground">Poprawna odpowiedź</p>
         </div>
       </div>
 

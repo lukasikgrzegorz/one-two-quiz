@@ -15,8 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const PLAYER_TOKEN_KEY = "one-two-quiz-player-token";
-const SESSION_ID_KEY = "one-two-quiz-session-id";
+import { storePlayerSession } from "@/lib/game/storage";
 
 export function JoinSessionForm() {
   const [roomCode, setRoomCode] = useState("");
@@ -46,12 +45,20 @@ export function JoinSessionForm() {
         throw new Error("Nie udało się dołączyć do sesji");
       }
 
-      localStorage.setItem(PLAYER_TOKEN_KEY, result.player_token);
-      localStorage.setItem(SESSION_ID_KEY, result.session_id);
+      storePlayerSession(result.player_token, result.session_id);
 
       router.push(`/lobby/${result.session_id}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Wystąpił błąd");
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" &&
+              err !== null &&
+              "message" in err &&
+              typeof err.message === "string"
+            ? err.message
+            : "Wystąpił błąd podczas dołączania do gry";
+      setError(message);
     } finally {
       setIsLoading(false);
     }

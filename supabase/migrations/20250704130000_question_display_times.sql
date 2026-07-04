@@ -3,6 +3,8 @@
 ALTER TABLE public.questions
   ADD COLUMN question_display_seconds integer NOT NULL DEFAULT 10
     CHECK (question_display_seconds > 0),
+  ADD COLUMN answer_collection_seconds integer NOT NULL DEFAULT 15
+    CHECK (answer_collection_seconds > 0),
   ADD COLUMN answer_display_seconds integer NOT NULL DEFAULT 5
     CHECK (answer_display_seconds > 0);
 

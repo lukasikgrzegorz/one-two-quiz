@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { LobbyPageClient } from "./lobby-page-client";
+import { PlayPageClient } from "./play-page-client";
 
-export default function LobbyPage({
+export default function PlayPage({
   params,
 }: {
   params: Promise<{ sessionId: string }>;
@@ -16,20 +16,20 @@ export default function LobbyPage({
           </Link>
         </div>
       </nav>
-      <div className="flex-1 flex items-center justify-center p-5 py-16">
+      <div className="flex-1 flex items-center justify-center p-5 py-10">
         <Suspense>
-          <LobbyPageContent params={params} />
+          <PlayPageWrapper params={params} />
         </Suspense>
       </div>
     </main>
   );
 }
 
-async function LobbyPageContent({
+async function PlayPageWrapper({
   params,
 }: {
   params: Promise<{ sessionId: string }>;
 }) {
   const { sessionId } = await params;
-  return <LobbyPageClient sessionId={sessionId} />;
+  return <PlayPageClient sessionId={sessionId} />;
 }

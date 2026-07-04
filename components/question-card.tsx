@@ -24,6 +24,7 @@ export function QuestionCard({
     id: string;
     text: string;
     question_display_seconds: number;
+    answer_collection_seconds: number;
     answer_display_seconds: number;
     answers: { id: string; text: string; is_correct: boolean; order_index: number }[];
   };
@@ -33,6 +34,7 @@ export function QuestionCard({
   const initial: QuestionFormInitial = {
     text: question.text,
     question_display_seconds: question.question_display_seconds,
+    answer_collection_seconds: question.answer_collection_seconds,
     answer_display_seconds: question.answer_display_seconds,
     answers: question.answers.map((a) => ({
       text: a.text,
@@ -52,7 +54,8 @@ export function QuestionCard({
             {!isEditing && (
               <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                Pytanie: {question.question_display_seconds}s · Odpowiedź:{" "}
+                Pytanie: {question.question_display_seconds}s · Wybór:{" "}
+                {question.answer_collection_seconds}s · Wynik:{" "}
                 {question.answer_display_seconds}s
               </p>
             )}

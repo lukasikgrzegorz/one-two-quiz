@@ -7,7 +7,7 @@
 
 CREATE TYPE public.game_session_status AS ENUM ('lobby', 'active', 'finished');
 
-CREATE TYPE public.game_phase AS ENUM ('question', 'reveal', 'leaderboard');
+CREATE TYPE public.game_phase AS ENUM ('question', 'answers', 'reveal', 'leaderboard');
 
 -- =============================================================================
 -- Tabele
@@ -337,9 +337,9 @@ BEGIN
 
   IF EXISTS (
     SELECT 1
-    FROM public.players
-    WHERE session_id = v_session.id
-      AND lower(nickname) = lower(v_nickname)
+    FROM public.players p
+    WHERE p.session_id = v_session.id
+      AND lower(p.nickname) = lower(v_nickname)
   ) THEN
     RAISE EXCEPTION 'Nick jest już zajęty w tym pokoju';
   END IF;
@@ -385,8 +385,8 @@ BEGIN
   FROM public.game_sessions
   WHERE id = v_player.session_id;
 
-  IF v_session.status <> 'active' OR v_session.phase <> 'question' THEN
-    RAISE EXCEPTION 'Odpowiedzi można składać tylko podczas aktywnego pytania';
+  IF v_session.status <> 'active' OR v_session.phase <> 'answers' THEN
+    RAISE EXCEPTION 'Odpowiedzi można składać tylko gdy opcje są widoczne';
   END IF;
 
   SELECT *

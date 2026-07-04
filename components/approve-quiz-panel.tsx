@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { StartSessionButton } from "@/components/start-session-button";
 import { CheckCircle2, CircleDashed } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -87,14 +88,17 @@ export function ApproveQuizPanel({
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         {isApproved ? (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleUnapprove}
-            disabled={isPending}
-          >
-            {isPending ? "Cofanie..." : "Cofnij zatwierdzenie"}
-          </Button>
+          <>
+            <StartSessionButton quizId={quizId} />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleUnapprove}
+              disabled={isPending}
+            >
+              {isPending ? "Cofanie..." : "Cofnij zatwierdzenie"}
+            </Button>
+          </>
         ) : (
           <Button
             type="button"
