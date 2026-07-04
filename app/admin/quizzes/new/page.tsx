@@ -19,10 +19,12 @@ export default function NewQuizPage() {
   return (
     <main className="min-h-screen flex flex-col">
       <HomeHeader />
-      <div className="flex-1 flex items-center justify-center p-5 py-16">
-        <Suspense>
-          <NewQuizContent />
-        </Suspense>
+      <div className="flex-1 w-full p-5 px-5 pt-8 pb-16">
+        <div className="w-full max-w-5xl mx-auto">
+          <Suspense>
+            <NewQuizContent />
+          </Suspense>
+        </div>
       </div>
     </main>
   );

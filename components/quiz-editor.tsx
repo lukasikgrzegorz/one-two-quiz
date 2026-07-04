@@ -50,7 +50,7 @@ export async function QuizEditor({ quizId }: { quizId: string }) {
   }));
 
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <Button variant="ghost" size="sm" asChild className="mb-2 -ml-2">

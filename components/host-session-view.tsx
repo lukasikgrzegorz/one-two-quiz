@@ -15,9 +15,11 @@ import {
 import { useCurrentQuestion } from "@/hooks/use-current-question";
 import { useGameSession } from "@/hooks/use-game-session";
 import { useQuestionAnswerCount } from "@/hooks/use-question-answer-count";
-import { useQuestionRoundScores } from "@/hooks/use-question-round-scores";
+import { useQuestionAnswerDistribution } from "@/hooks/use-question-answer-distribution";
 import { useSessionPlayers } from "@/hooks/use-session-players";
+import { ANSWER_COLORS } from "@/lib/game/constants";
 import { getPhaseDurationSeconds } from "@/lib/game/timer";
+import { cn } from "@/lib/utils";
 import { Check, Copy, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -38,7 +40,7 @@ export function HostSessionView({
     sessionId,
     session?.phase === "answers" ? (question?.id ?? null) : null,
   );
-  const roundScores = useQuestionRoundScores(
+  const { distribution, totalAnswered } = useQuestionAnswerDistribution(
     sessionId,
     session?.phase === "reveal" ? (question?.id ?? null) : null,
   );
@@ -97,12 +99,14 @@ export function HostSessionView({
   };
 
   if (loading || !session) {
-    return <p className="text-center text-muted-foreground">Ładowanie...</p>;
+    return (
+      <p className="text-center text-muted-foreground my-auto">Ładowanie...</p>
+    );
   }
 
   if (session.status === "lobby") {
     return (
-      <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
+      <div className="w-full max-w-lg mx-auto flex flex-col gap-6 my-auto">
         <Card>
           <CardHeader className="text-center">
             <CardDescription>{quizTitle}</CardDescription>
@@ -154,19 +158,29 @@ export function HostSessionView({
 
   if (session.status === "finished") {
     return (
-      <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Koniec gry!</CardTitle>
-            <CardDescription>{quizTitle}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LeaderboardView sessionId={sessionId} />
-            <Button asChild className="w-full mt-6">
-              <Link href="/">Wróć do quizów</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="flex flex-col flex-1 w-full max-w-6xl mx-auto min-h-0">
+        <header className="flex items-center justify-between gap-4 shrink-0 pb-4 border-b border-foreground/10">
+          <div className="min-w-0">
+            <p className="text-sm text-muted-foreground truncate">{quizTitle}</p>
+            <p className="text-2xl md:text-3xl font-bold">Koniec gry</p>
+          </div>
+          <Badge className="shrink-0">Finał</Badge>
+        </header>
+
+        <section className="flex-1 flex flex-col gap-4 py-6 md:py-8 min-h-0">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold shrink-0">
+            Ranking
+          </h1>
+          <div className="flex-1 min-h-0 flex flex-col">
+            <LeaderboardView sessionId={sessionId} variant="host" />
+          </div>
+        </section>
+
+        <footer className="shrink-0 pt-4 border-t border-foreground/10">
+          <Button asChild size="lg" className="w-full">
+            <Link href="/">Wróć do quizów</Link>
+          </Button>
+        </footer>
       </div>
     );
   }
@@ -184,146 +198,147 @@ export function HostSessionView({
   const isLastQuestion =
     session.current_question_index + 1 >= totalQuestions;
   const isLeaderboard = session.phase === "leaderboard";
-  const advanceLabel = isLeaderboard
-    ? isLastQuestion
-      ? "Zakończ grę"
-      : "Następne pytanie"
-    : "Następna faza";
+  const advanceLabel = isLastQuestion ? "Zakończ grę" : "Następne pytanie";
+  const questionNumber = session.current_question_index + 1;
 
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{quizTitle}</p>
-          <p className="font-medium">
-            Pytanie {session.current_question_index + 1} / {totalQuestions}
+    <div className="flex flex-col flex-1 w-full max-w-6xl mx-auto min-h-0">
+      <header className="flex items-center justify-between gap-4 shrink-0 pb-4 border-b border-foreground/10">
+        <div className="min-w-0">
+          <p className="text-sm text-muted-foreground truncate">{quizTitle}</p>
+          <p className="text-2xl md:text-3xl font-bold tabular-nums">
+            Pytanie {questionNumber}{" "}
+            <span className="text-muted-foreground font-normal">
+              / {totalQuestions}
+            </span>
           </p>
         </div>
-        <Badge>{phaseLabel}</Badge>
-      </div>
+        <Badge className="shrink-0">{phaseLabel}</Badge>
+      </header>
 
-      {session.phase === "answers" ? (
-        <div className="flex flex-col gap-4">
-          <div className="text-center">
-            <p className="text-3xl font-mono font-bold tabular-nums">
-              {answeredCount} / {players.length}
-            </p>
-            <p className="text-sm text-muted-foreground mt-1">
-              udzielonych odpowiedzi
-            </p>
+      {isLeaderboard ? (
+        <section className="flex-1 flex flex-col gap-4 py-6 md:py-8 min-h-0">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold shrink-0">
+            Ranking
+          </h1>
+          <div className="flex-1 min-h-0 flex flex-col">
+            <LeaderboardView sessionId={sessionId} variant="host" />
           </div>
-          <GameTimer
-            startedAt={session.question_started_at}
-            durationSeconds={duration}
-          />
-        </div>
+        </section>
       ) : (
-        !isLeaderboard && (
-          <GameTimer
-            startedAt={session.question_started_at}
-            durationSeconds={duration}
-          />
+        question && (
+          <section className="flex-1 flex items-start justify-center py-6 md:py-10 min-h-0 overflow-y-auto">
+            <h1 className="w-full text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-balance">
+              {question.text}
+            </h1>
+          </section>
         )
       )}
 
-      {question && session.phase === "question" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">{question.text}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-center text-muted-foreground text-sm">
-              Gracze czytają pytanie — odpowiedzi pojawią się za chwilę
+      <footer className="shrink-0 flex flex-col gap-4 pt-4 border-t border-foreground/10">
+        {session.phase === "question" && (
+          <p className="text-center text-muted-foreground text-sm md:text-base py-2">
+            Gracze czytają pytanie — odpowiedzi pojawią się za chwilę
+          </p>
+        )}
+
+        {session.phase === "answers" && question && (
+          <>
+            <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:justify-between">
+              <div>
+                <p className="text-2xl md:text-3xl font-mono font-bold tabular-nums">
+                  {answeredCount} / {players.length}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  udzielonych odpowiedzi
+                </p>
+              </div>
+              <div className="w-full sm:max-w-xs">
+                <GameTimer
+                  startedAt={session.question_started_at}
+                  durationSeconds={duration}
+                />
+              </div>
+            </div>
+            <ul className="grid gap-3 grid-cols-1 sm:grid-cols-2 w-full">
+              {question.answers.map((a, i) => (
+                <li
+                  key={a.id}
+                  className={cn(
+                    "rounded-xl border-2 px-4 py-4 md:py-5 text-base md:text-lg font-semibold",
+                    ANSWER_COLORS[i] ?? ANSWER_COLORS[0],
+                  )}
+                >
+                  {String.fromCharCode(65 + i)}. {a.text}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {session.phase === "reveal" && question && (
+          <>
+            <p className="text-sm text-muted-foreground">
+              {totalAnswered > 0
+                ? `${totalAnswered} ${totalAnswered === 1 ? "gracz odpowiedział" : "graczy odpowiedziało"}`
+                : "Brak odpowiedzi"}
             </p>
-          </CardContent>
-        </Card>
-      )}
+            <ul className="grid gap-3 grid-cols-1 sm:grid-cols-2 w-full">
+              {question.answers.map((a, i) => {
+                const stats = distribution.find((d) => d.answer_id === a.id);
+                const percent = stats?.percent ?? 0;
 
-      {question && session.phase === "answers" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{question.text}</CardTitle>
-            <CardDescription>Gracze wybierają odpowiedź</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="grid gap-2 sm:grid-cols-2">
-              {question.answers.map((a, i) => (
-                <li
-                  key={a.id}
-                  className="rounded-lg border px-4 py-3 text-sm font-medium"
-                >
-                  {String.fromCharCode(65 + i)}. {a.text}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
-
-      {question && session.phase === "reveal" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{question.text}</CardTitle>
-            <CardDescription>Poprawna odpowiedź</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="grid gap-2 sm:grid-cols-2">
-              {question.answers.map((a, i) => (
-                <li
-                  key={a.id}
-                  className={`rounded-lg border px-4 py-3 text-sm font-medium ${
-                    a.is_correct ? "border-green-500 bg-green-500/10" : ""
-                  }`}
-                >
-                  {String.fromCharCode(65 + i)}. {a.text}
-                  {a.is_correct && " ✓"}
-                </li>
-              ))}
-            </ul>
-            {roundScores.length > 0 && (
-              <ul className="mt-4 space-y-2 border-t pt-4">
-                {roundScores.map((entry) => (
+                return (
                   <li
-                    key={entry.player_id}
-                    className="flex items-center justify-between text-sm"
+                    key={a.id}
+                    className={cn(
+                      "relative overflow-hidden rounded-xl border-2 text-base md:text-lg font-semibold",
+                      ANSWER_COLORS[i] ?? ANSWER_COLORS[0],
+                      a.is_correct
+                        ? "ring-2 ring-white ring-offset-2 ring-offset-background"
+                        : "opacity-80",
+                    )}
                   >
-                    <span>{entry.nickname}</span>
-                    <span className="font-mono font-semibold tabular-nums">
-                      +{entry.points_earned} pkt
-                    </span>
+                    <div
+                      className="absolute inset-y-0 left-0 bg-black/20 transition-[width] duration-500 ease-out"
+                      style={{ width: `${percent}%` }}
+                    />
+                    <div className="relative flex items-center justify-between gap-3 px-4 py-4 md:py-5">
+                      <span className="min-w-0">
+                        {String.fromCharCode(65 + i)}. {a.text}
+                        {a.is_correct && " ✓"}
+                      </span>
+                      <span className="shrink-0 font-mono text-xl md:text-2xl font-bold tabular-nums">
+                        {percent}%
+                      </span>
+                    </div>
                   </li>
-                ))}
-              </ul>
+                );
+              })}
+            </ul>
+          </>
+        )}
+
+        {isLeaderboard && (
+          <>
+            {error && (
+              <p className="text-sm text-destructive text-center">{error}</p>
             )}
-          </CardContent>
-        </Card>
-      )}
+            <Button
+              size="lg"
+              onClick={handleAdvance}
+              disabled={isAdvancing}
+              className="w-full"
+            >
+              {isAdvancing ? "Przechodzenie..." : advanceLabel}
+            </Button>
+          </>
+        )}
 
-      {isLeaderboard && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Ranking</CardTitle>
-            <CardDescription>
-              Sprawdź wyniki, potem przejdź dalej przyciskiem poniżej
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LeaderboardView sessionId={sessionId} />
-          </CardContent>
-        </Card>
-      )}
-
-      {error && <p className="text-sm text-destructive text-center">{error}</p>}
-
-      <Button
-        size={isLeaderboard ? "lg" : "default"}
-        variant={isLeaderboard ? "default" : "outline"}
-        onClick={handleAdvance}
-        disabled={isAdvancing}
-        className={isLeaderboard ? "w-full" : undefined}
-      >
-        {isAdvancing ? "Przechodzenie..." : advanceLabel}
-      </Button>
+        {!isLeaderboard && error && (
+          <p className="text-sm text-destructive text-center">{error}</p>
+        )}
+      </footer>
     </div>
   );
 }

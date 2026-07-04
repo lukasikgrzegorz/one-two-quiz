@@ -1,5 +1,6 @@
 "use client";
 
+import { AppLogo } from "@/components/app-logo";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -65,7 +65,12 @@ export function JoinSessionForm() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto flex flex-col gap-6">
+      <div className="flex flex-col items-center gap-3">
+        <AppLogo size="lg" />
+        <div className="h-1.5 w-full max-w-xs rounded-full rainbow-gradient" />
+      </div>
+      <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-3xl">Dołącz do gry</CardTitle>
         <CardDescription>
@@ -104,13 +109,8 @@ export function JoinSessionForm() {
             {isLoading ? "Dołączanie..." : "Dołącz"}
           </Button>
         </form>
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Prowadzisz quiz?{" "}
-          <Link href="/auth/login" className="underline underline-offset-4">
-            Zaloguj się jako host
-          </Link>
-        </p>
       </CardContent>
     </Card>
+    </div>
   );
 }

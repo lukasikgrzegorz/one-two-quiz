@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Dancing_Script, Geist, Oswald, Source_Serif_4 } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
@@ -9,7 +9,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "One Two Quiz",
+  title: "RaspdwaQUIZ",
   description: "Lekka aplikacja do quizów na żywo — jak Kahoot",
 };
 
@@ -19,14 +19,37 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const raspFont = Dancing_Script({
+  variable: "--font-rasp",
+  display: "swap",
+  subsets: ["latin"],
+  weight: "700",
+});
+
+const dwaFont = Source_Serif_4({
+  variable: "--font-dwa",
+  display: "swap",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const quizFont = Oswald({
+  variable: "--font-quiz",
+  display: "swap",
+  subsets: ["latin"],
+  weight: "700",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+    <html lang="pl" suppressHydrationWarning>
+      <body
+        className={`${geistSans.className} ${raspFont.variable} ${dwaFont.variable} ${quizFont.variable} antialiased`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

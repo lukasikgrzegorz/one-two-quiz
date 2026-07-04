@@ -11,12 +11,5 @@ export async function AuthButton() {
     return null;
   }
 
-  return (
-    <div className="flex items-center gap-4">
-      <span className="text-muted-foreground hidden sm:inline">
-        {user.email}
-      </span>
-      <LogoutButton />
-    </div>
-  );
+  return <LogoutButton />;
 }

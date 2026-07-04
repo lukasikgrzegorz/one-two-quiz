@@ -14,6 +14,7 @@ import { useCurrentQuestion } from "@/hooks/use-current-question";
 import { useGameSession } from "@/hooks/use-game-session";
 import { ANSWER_COLORS } from "@/lib/game/constants";
 import { getPhaseDurationSeconds } from "@/lib/game/timer";
+import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -95,22 +96,27 @@ export function PlayerGameView({
 
   if (session.status === "finished") {
     return (
-      <div className="w-full max-w-md mx-auto flex flex-col gap-6">
-        <Card>
-          <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl">Koniec gry!</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-6">
-            <PlayerRankView
-              sessionId={sessionId}
-              playerToken={playerToken}
-              variant="final"
-            />
-            <Button asChild className="w-full">
-              <Link href="/">Wróć na stronę główną</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="w-full max-w-lg mx-auto flex flex-col flex-1 gap-6 self-start md:self-center min-h-[60vh]">
+        <div className="flex items-center justify-end shrink-0">
+          <Badge variant="secondary">Koniec gry</Badge>
+        </div>
+
+        <section className="flex-1 flex flex-col items-center justify-center gap-6 py-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">
+            Ranking
+          </h1>
+          <PlayerRankView
+            sessionId={sessionId}
+            playerToken={playerToken}
+            variant="final"
+          />
+        </section>
+
+        <footer className="shrink-0">
+          <Button asChild size="lg" className="w-full">
+            <Link href="/">Wróć na stronę główną</Link>
+          </Button>
+        </footer>
       </div>
     );
   }
@@ -133,14 +139,10 @@ export function PlayerGameView({
 
   if (session.phase === "question") {
     return (
-      <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <Badge variant="secondary">{phaseBadge}</Badge>
-          <GameTimer
-            startedAt={session.question_started_at}
-            durationSeconds={duration}
-          />
-        </div>
+      <div className="w-full max-w-lg mx-auto flex flex-col gap-6 my-auto">
+        <Badge variant="secondary" className="w-fit">
+          {phaseBadge}
+        </Badge>
         <Card>
           <CardHeader>
             <CardTitle className="text-xl leading-snug text-center">
@@ -159,9 +161,11 @@ export function PlayerGameView({
 
   if (session.phase === "answers") {
     return (
-      <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <Badge variant="secondary">{phaseBadge}</Badge>
+      <div className="w-full max-w-lg mx-auto flex flex-col gap-6 self-start md:self-center">
+        <div className="flex flex-col gap-4">
+          <Badge variant="secondary" className="w-fit">
+            {phaseBadge}
+          </Badge>
           <GameTimer
             startedAt={session.question_started_at}
             durationSeconds={duration}
@@ -179,7 +183,10 @@ export function PlayerGameView({
                 type="button"
                 disabled={submitting}
                 onClick={() => handleAnswer(answer.id)}
-                className={`rounded-xl border-2 px-4 py-5 text-left font-semibold text-white transition-opacity disabled:opacity-60 ${ANSWER_COLORS[index] ?? ANSWER_COLORS[0]}`}
+                className={cn(
+                  "rounded-xl border-2 px-4 py-5 text-left font-semibold transition-opacity disabled:opacity-60",
+                  ANSWER_COLORS[index] ?? ANSWER_COLORS[0],
+                )}
               >
                 {answer.text}
               </button>
@@ -197,14 +204,10 @@ export function PlayerGameView({
     const correctAnswer = question.answers.find((a) => a.is_correct);
 
     return (
-      <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <Badge variant="secondary">{phaseBadge}</Badge>
-          <GameTimer
-            startedAt={session.question_started_at}
-            durationSeconds={duration}
-          />
-        </div>
+      <div className="w-full max-w-lg mx-auto flex flex-col gap-6 my-auto">
+        <Badge variant="secondary" className="w-fit">
+          {phaseBadge}
+        </Badge>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-lg text-muted-foreground font-normal">
@@ -233,22 +236,22 @@ export function PlayerGameView({
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
-      <div className="flex items-center justify-center">
+    <div className="w-full max-w-lg mx-auto flex flex-col flex-1 gap-6 my-auto min-h-[50vh]">
+      <div className="flex items-center justify-end shrink-0">
         <Badge variant="secondary">{phaseBadge}</Badge>
       </div>
-      <Card>
-        <CardContent className="pt-6 flex flex-col gap-4">
-          <PlayerRankView
-            sessionId={sessionId}
-            playerToken={playerToken}
-            variant="inline"
-          />
-          <p className="text-center text-sm text-muted-foreground">
-            Poczekaj, aż prowadzący przejdzie dalej...
-          </p>
-        </CardContent>
-      </Card>
+
+      <section className="flex-1 flex flex-col items-center justify-center gap-6 py-6">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">Ranking</h1>
+        <PlayerRankView
+          sessionId={sessionId}
+          playerToken={playerToken}
+          variant="inline"
+        />
+        <p className="text-center text-sm text-muted-foreground">
+          Poczekaj, aż prowadzący przejdzie dalej...
+        </p>
+      </section>
     </div>
   );
 }

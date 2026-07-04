@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { AppFooter } from "@/components/app-footer";
+import { AppTopBar } from "@/components/app-top-bar";
 import { Suspense } from "react";
 import { PlayPageClient } from "./play-page-client";
 
@@ -9,18 +10,13 @@ export default function PlayPage({
 }) {
   return (
     <main className="min-h-screen flex flex-col">
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-          <Link href="/" className="font-semibold text-lg">
-            One Two Quiz
-          </Link>
-        </div>
-      </nav>
-      <div className="flex-1 flex items-center justify-center p-5 py-10">
+      <AppTopBar />
+      <div className="flex-1 flex flex-col min-h-0 p-4 md:p-6">
         <Suspense>
           <PlayPageWrapper params={params} />
         </Suspense>
       </div>
+      <AppFooter />
     </main>
   );
 }

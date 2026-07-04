@@ -9,9 +9,11 @@ import { useState } from "react";
 export function StartSessionButton({
   quizId,
   size = "default",
+  className,
 }: {
   quizId: string;
   size?: "default" | "sm";
+  className?: string;
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -42,10 +44,11 @@ export function StartSessionButton({
       <Button
         type="button"
         size={size}
+        className={className}
         onClick={handleStart}
         disabled={isPending}
       >
-        <Play className="mr-2 h-4 w-4" />
+        <Play />
         {isPending ? "Tworzenie..." : "Uruchom grę"}
       </Button>
       {error && (

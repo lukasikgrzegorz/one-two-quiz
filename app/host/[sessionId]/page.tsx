@@ -1,3 +1,4 @@
+import { AppFooter } from "@/components/app-footer";
 import { HomeHeader } from "@/components/home-header";
 import { HostSessionView } from "@/components/host-session-view";
 import { createClient } from "@/lib/supabase/server";
@@ -12,11 +13,12 @@ export default function HostSessionPage({
   return (
     <main className="min-h-screen flex flex-col">
       <HomeHeader />
-      <div className="flex-1 flex items-center justify-center p-5 py-10">
+      <div className="flex-1 flex flex-col min-h-0 p-4 md:p-6">
         <Suspense>
           <HostPageContent params={params} />
         </Suspense>
       </div>
+      <AppFooter />
     </main>
   );
 }

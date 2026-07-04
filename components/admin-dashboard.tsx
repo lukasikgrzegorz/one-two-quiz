@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { StartSessionButton } from "@/components/start-session-button";
 import { createClient } from "@/lib/supabase/server";
-import { Plus } from "lucide-react";
+import { Pencil } from "lucide-react";
 import Link from "next/link";
 
 type QuizRow = {
@@ -30,7 +30,7 @@ export async function AdminDashboard() {
 
   if (error) {
     return (
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full">
         <CardContent className="pt-6">
           <p className="text-sm text-destructive text-center">
             Nie udało się załadować quizów: {error.message}
@@ -43,7 +43,7 @@ export async function AdminDashboard() {
   const quizList = (quizzes ?? []) as QuizRow[];
 
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Twoje quizy</h1>
@@ -51,10 +51,9 @@ export async function AdminDashboard() {
             Twórz quizy i uruchamiaj sesje gry
           </p>
         </div>
-        <Button asChild>
+        <Button asChild variant="rainbow">
           <Link href="/admin/quizzes/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Nowy quiz
+            <span className="rainbow-text font-semibold">+ Nowy quiz</span>
           </Link>
         </Button>
       </div>
@@ -68,10 +67,11 @@ export async function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center pb-6">
-            <Button asChild>
+            <Button asChild variant="rainbow">
               <Link href="/admin/quizzes/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Stwórz pierwszy quiz
+                <span className="rainbow-text font-semibold">
+                  + Stwórz pierwszy quiz
+                </span>
               </Link>
             </Button>
           </CardContent>
@@ -85,27 +85,38 @@ export async function AdminDashboard() {
               <li key={quiz.id}>
                 <Card>
                   <CardContent className="flex items-center justify-between gap-4 py-4">
-                    <Link
-                      href={`/admin/quizzes/${quiz.id}`}
-                      className="flex-1 min-w-0 hover:opacity-80 transition-opacity"
-                    >
+                    <div className="flex-1 min-w-0">
                       <p className="font-medium">{quiz.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(quiz.created_at).toLocaleDateString("pl-PL")}
-                      </p>
-                    </Link>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {quiz.status === "approved" && <Badge>Gotowy</Badge>}
-                      <Badge variant="secondary">
-                        {questionCount}{" "}
-                        {questionCount === 1
-                          ? "pytanie"
-                          : questionCount < 5
-                            ? "pytania"
-                            : "pytań"}
-                      </Badge>
+                      <div className="flex items-center gap-2 mt-1">
+                        {quiz.status === "approved" && <Badge>Gotowy</Badge>}
+                        <Badge variant="secondary">
+                          {questionCount}{" "}
+                          {questionCount === 1
+                            ? "pytanie"
+                            : questionCount < 5
+                              ? "pytania"
+                              : "pytań"}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="w-36"
+                      >
+                        <Link href={`/admin/quizzes/${quiz.id}`}>
+                          <Pencil />
+                          Edytuj
+                        </Link>
+                      </Button>
                       {quiz.status === "approved" && (
-                        <StartSessionButton quizId={quiz.id} size="sm" />
+                        <StartSessionButton
+                          quizId={quiz.id}
+                          size="sm"
+                          className="w-36"
+                        />
                       )}
                     </div>
                   </CardContent>

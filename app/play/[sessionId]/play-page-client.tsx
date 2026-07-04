@@ -53,6 +53,8 @@ export function PlayPageClient({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <PlayerGameView sessionId={sessionId} playerToken={playerToken} />
+    <div className="flex-1 flex flex-col min-h-0 w-full">
+      <PlayerGameView sessionId={sessionId} playerToken={playerToken} />
+    </div>
   );
 }
