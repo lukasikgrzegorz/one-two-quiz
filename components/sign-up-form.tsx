@@ -43,12 +43,10 @@ export function SignUpForm({
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
-        },
       });
       if (error) throw error;
-      router.push("/auth/sign-up-success");
+      router.push("/");
+      router.refresh();
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -60,8 +58,8 @@ export function SignUpForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
+          <CardTitle className="text-2xl">Rejestracja hosta</CardTitle>
+          <CardDescription>Utwórz konto administratora</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>

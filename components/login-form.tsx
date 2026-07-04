@@ -38,8 +38,8 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
+      router.push("/");
+      router.refresh();
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -51,9 +51,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Logowanie hosta</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Zaloguj się, żeby tworzyć quizy i prowadzić gry
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -93,14 +93,21 @@ export function LoginForm({
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
+            <div className="mt-4 text-center text-sm space-y-2">
+              <p>
+                Nie masz konta?{" "}
+                <Link
+                  href="/auth/sign-up"
+                  className="underline underline-offset-4"
+                >
+                  Zarejestruj się
+                </Link>
+              </p>
+              <p>
+                <Link href="/" className="text-muted-foreground underline-offset-4 hover:underline">
+                  Wróć na stronę główną
+                </Link>
+              </p>
             </div>
           </form>
         </CardContent>
